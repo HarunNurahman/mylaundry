@@ -5,33 +5,31 @@ import 'package:mylaundry/configs/constants/app_asset.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
 import 'package:mylaundry/configs/constants/app_response.dart';
+import 'package:mylaundry/configs/constants/app_session.dart';
 import 'package:mylaundry/configs/constants/failure.dart';
 import 'package:mylaundry/configs/sources/user_source.dart';
-import 'package:mylaundry/providers/register_provider.dart';
+import 'package:mylaundry/providers/login_provider.dart';
 import 'package:mylaundry/widgets/custom_auth_form_field.dart';
 
-class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  TextEditingController usernameController = TextEditingController();
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
 
   execute() {
-    setRegisterStatus(ref, 'Loading');
+    setLoginStatus(ref, 'Loading');
 
-    UserSource.register(
-      usernameController.text,
-      emailController.text,
-      passwordController.text,
-    ).then((value) {
+    UserSource.login(emailController.text, passwordController.text).then((
+      value,
+    ) {
       value.fold(
         (failure) {
           switch (failure.runtimeType) {
@@ -58,23 +56,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             case InvalidInputFailure _:
               AppResponse.invalidInput(context, failure.message ?? '');
               break;
-            case UnauthorisedFailure _:
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(failure.message!)));
-              break;
             default:
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(failure.message!)));
+              break;
           }
-          setRegisterStatus(ref, failure.message ?? '');
+          setLoginStatus(ref, 'Failed');
         },
         (result) {
+          AppSession.saveUser(result['data']);
+          AppSession.saveBearerToken(result['token']);
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Register Success')));
-          setRegisterStatus(ref, 'Success');
+          ).showSnackBar(SnackBar(content: Text('Login Success')));
+          setLoginStatus(ref, 'Success');
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/dashboard',
+            (route) => false,
+          );
         },
       );
     });
@@ -132,17 +133,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     spacing: 16,
                     children: [
                       CustomAuthFormField(
-                        controller: usernameController,
-                        hintText: 'Username',
-                        iconUrl: Icons.person,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your username';
-                          }
-                          return null;
-                        },
-                      ),
-                      CustomAuthFormField(
                         controller: emailController,
                         hintText: 'Email',
                         iconUrl: Icons.mail,
@@ -168,10 +158,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       Consumer(
                         builder: (context, ref, child) {
-                          String status = ref.watch(registerStatusProvider);
+                          String status = ref.watch(loginStatusProvider);
                           if (status == 'Loading') {
                             return CircularProgressIndicator();
                           }
+
                           return ElevatedButton(
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
@@ -182,7 +173,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               minimumSize: Size(double.infinity, 50),
                             ),
                             child: Text(
-                              'Register',
+                              'Login',
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 color: AppColor.whiteColor,
@@ -192,9 +183,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         },
                       ),
                       TextButton(
-                        onPressed: () => Navigator.pushNamed(context, '/'),
+                        onPressed:
+                            () => Navigator.pushNamed(context, '/register'),
                         child: Text(
-                          'Already have an account? Login',
+                          'Create an Account',
                           style: GoogleFonts.poppins(
                             color: AppColor.whiteColor,
                             fontSize: 16,

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
-import 'package:mylaundry/configs/constants/routes.dart';
+import 'package:mylaundry/configs/constants/app_session.dart';
+import 'package:mylaundry/screen/auth/login_screen.dart';
+import 'package:mylaundry/screen/home/dashboard_screen.dart';
 
 void main() {
-  runApp(ProviderScope(child: const MainApp()));
+  runApp(ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -17,10 +19,10 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: AppColor.primary,
-        scaffoldBackgroundColor: AppColor.whiteColor,
+        scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.light(
           primary: AppColor.primary,
-          secondary: AppColor.primary.withValues(alpha: 0.4),
+          secondary: Colors.greenAccent[400]!,
         ),
         textTheme: GoogleFonts.latoTextTheme(),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -30,14 +32,21 @@ class MainApp extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             padding: WidgetStatePropertyAll(
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
-            textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 14)),
+            textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 15)),
           ),
         ),
       ),
-      routes: Routes.getRoutes(),
-      initialRoute: '/register',
+      home: FutureBuilder(
+        future: AppSession.getUser(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) {
+            return LoginScreen();
+          }
+          return DashboardScreen();
+        },
+      ),
     );
   }
 }
