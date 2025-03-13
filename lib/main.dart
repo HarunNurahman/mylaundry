@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mylaundry/config/app_color.dart';
+import 'package:mylaundry/configs/constants/app_color.dart';
+import 'package:mylaundry/configs/constants/routes.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(ProviderScope(child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -34,7 +36,8 @@ class MainApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Scaffold(body: Center(child: Text('Hello World!'))),
+      routes: Routes.getRoutes(),
+      initialRoute: '/register',
     );
   }
 }
