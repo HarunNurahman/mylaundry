@@ -6,7 +6,7 @@ import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
 import 'package:mylaundry/configs/constants/app_response.dart';
 import 'package:mylaundry/configs/constants/failure.dart';
-import 'package:mylaundry/configs/sources/user_source.dart';
+import 'package:mylaundry/configs/services/user_service.dart';
 import 'package:mylaundry/providers/register_provider.dart';
 import 'package:mylaundry/widgets/custom_auth_form_field.dart';
 

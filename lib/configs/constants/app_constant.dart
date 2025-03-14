@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:mylaundry/screen/home/home_screen.dart';
+import 'package:mylaundry/screen/profile/profile_screen.dart';
+
 class AppConstant {
   static const appName = 'MyLaundry';
 
@@ -19,5 +23,19 @@ class AppConstant {
     'Ironed',
     'Done',
     'Delivery',
+  ];
+
+  static List<Map> dashboardNavigation = [
+    {'view': HomeScreen(), 'icon': Icon(Icons.home), 'label': 'Home'},
+    {
+      'view': HomeScreen(),
+      'icon': Icon(Icons.local_laundry_service),
+      'label': 'My Laundry',
+    },
+    {
+      'view': ProfileScreen(),
+      'icon': Icon(Icons.account_circle),
+      'label': 'Account',
+    },
   ];
 }
