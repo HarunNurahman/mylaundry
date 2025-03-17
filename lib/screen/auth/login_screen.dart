@@ -7,8 +7,9 @@ import 'package:mylaundry/configs/constants/app_constant.dart';
 import 'package:mylaundry/configs/constants/app_response.dart';
 import 'package:mylaundry/configs/constants/app_session.dart';
 import 'package:mylaundry/configs/constants/failure.dart';
-import 'package:mylaundry/configs/services/user_service.dart';
-import 'package:mylaundry/providers/login_provider.dart';
+import 'package:mylaundry/configs/services/user/user_service.dart';
+import 'package:mylaundry/providers/auth/login_provider.dart';
+import 'package:mylaundry/screen/dashboard/dashboard_screen.dart';
 import 'package:mylaundry/widgets/custom_auth_form_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -71,9 +72,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             context,
           ).showSnackBar(SnackBar(content: Text('Login Success')));
           setLoginStatus(ref, 'Success');
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushAndRemoveUntil(
             context,
-            '/dashboard',
+            MaterialPageRoute(builder: (context) => const DashboardScreen()),
             (route) => false,
           );
         },

@@ -38,4 +38,6 @@ class AppConstant {
       'label': 'Account',
     },
   ];
+
+  static const laundryCategories = ['All', 'Regular', 'Express', 'Economical'];
 }

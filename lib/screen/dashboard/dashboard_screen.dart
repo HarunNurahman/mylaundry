@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
-import 'package:mylaundry/providers/dashboard_provider.dart';
+import 'package:mylaundry/providers/dashboard/dashboard_provider.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});

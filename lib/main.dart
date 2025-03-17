@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_session.dart';
 import 'package:mylaundry/screen/auth/login_screen.dart';
-import 'package:mylaundry/screen/home/dashboard_screen.dart';
+import 'package:mylaundry/screen/dashboard/dashboard_screen.dart';
 
 void main() {
   runApp(ProviderScope(child: MainApp()));
