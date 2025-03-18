@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
 import 'package:mylaundry/configs/constants/app_format.dart';
+import 'package:mylaundry/widgets/image_error_placeholder.dart';
 
 class PromoShopCard extends StatelessWidget {
   final VoidCallback onTap;
@@ -38,25 +39,8 @@ class PromoShopCard extends StatelessWidget {
                   Uri.encodeFull('${AppConstant.imageUrl}/promo/$imgUrl'),
                 ),
                 fit: BoxFit.cover,
-                imageErrorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: AppColor.primary100,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, color: AppColor.primary),
-                        SizedBox(height: 8),
-                        Text(
-                          'Image not available',
-                          style: GoogleFonts.poppins(
-                            color: AppColor.primary,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                imageErrorBuilder:
+                    (context, error, stackTrace) => ImageErrorPlaceholder(),
               ),
             ),
           ),

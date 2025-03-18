@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class PromoService {
   static Future<Either<Failure, Map>> readPromo() async {
-    Uri url = Uri.parse('${AppConstant.baseUrl}/promo/limit');
+    Uri url = Uri.parse('${AppConstant.baseUrl}/promo');
     final token = await AppSession.getBearerToken();
     try {
       final response = await http.get(url, headers: AppRequest.header(token));

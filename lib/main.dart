@@ -25,6 +25,10 @@ class MainApp extends StatelessWidget {
           secondary: Colors.greenAccent[400]!,
         ),
         textTheme: GoogleFonts.latoTextTheme(),
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColor.primary,
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(AppColor.primary),

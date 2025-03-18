@@ -8,7 +8,7 @@ import 'package:mylaundry/configs/constants/failure.dart';
 
 class ShopService {
   static Future<Either<Failure, Map>> readShopRecommendation() async {
-    Uri url = Uri.parse('${AppConstant.baseUrl}/shop/recommendation/limit');
+    Uri url = Uri.parse('${AppConstant.baseUrl}/shop/recommendation');
     final token = await AppSession.getBearerToken();
     try {
       final response = await http.get(url, headers: AppRequest.header(token));
@@ -36,6 +36,22 @@ class ShopService {
         return Left(e);
       }
 
+      return Left(FetchFailure(e.toString()));
+    }
+  }
+
+  static Future<Either<Failure, Map>> searchByCity(params) async {
+    Uri url = Uri.parse('${AppConstant.baseUrl}/shop/search?$params');
+    final token = await AppSession.getBearerToken();
+    try {
+      final response = await http.get(url, headers: AppRequest.header(token));
+
+      final data = AppResponse.data(response);
+      return Right(data);
+    } catch (e) {
+      if (e is Failure) {
+        return Left(e);
+      }
       return Left(FetchFailure(e.toString()));
     }
   }

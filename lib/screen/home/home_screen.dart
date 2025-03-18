@@ -9,6 +9,7 @@ import 'package:mylaundry/configs/services/shop/shop_service.dart';
 import 'package:mylaundry/models/promo/promo.dart';
 import 'package:mylaundry/models/shop/shop.dart';
 import 'package:mylaundry/providers/home/home_provider.dart';
+import 'package:mylaundry/screen/search/search_screen.dart';
 import 'package:mylaundry/widgets/laundry_shop_card.dart';
 import 'package:mylaundry/widgets/promo_shop_card.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -24,6 +25,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   ScrollController scrollController = ScrollController();
   int _currentPage = 1;
+  int _totalPage = 1;
   bool _isLoadingMore = false;
 
   getPromo() {
@@ -100,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   getLaundryMerchant() {
+    if (_currentPage > _totalPage) return;
     setState(() {
       _isLoadingMore = true;
     });
@@ -133,6 +136,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         (result) {
           setState(() {
             _isLoadingMore = false;
+            _totalPage = result['total_page'];
           });
           setLaundryMerchantStatus(ref, 'Success');
           List data = result['data'];
@@ -146,12 +150,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  searchLaundryByCity() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchScreen(query: searchController.text),
+      ),
+    );
+  }
+
+  void getData() {
     getShopRecommendation();
     getPromo();
     getLaundryMerchant();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getData());
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
               scrollController.position.maxScrollExtent &&
@@ -171,27 +188,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          controller: scrollController,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Column(
-            children: [
-              buildHeader(),
-              SizedBox(height: 32),
-              buildLaundryCategory(),
-              SizedBox(height: 24),
-              buildPromo(),
-              SizedBox(height: 24),
-              buildRecommendation(),
-              SizedBox(height: 24),
-              buildLaundryMerchant(),
-              if (_isLoadingMore)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
-                ),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () async => getData(),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            controller: scrollController,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              children: [
+                buildHeader(),
+                SizedBox(height: 32),
+                buildLaundryCategory(),
+                SizedBox(height: 24),
+                buildPromo(),
+                SizedBox(height: 24),
+                buildRecommendation(),
+                SizedBox(height: 24),
+                buildLaundryMerchant(),
+                if (_isLoadingMore)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -228,14 +248,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     filled: true,
                     fillColor: AppColor.primary100,
                     hintText: 'Search',
-                    prefixIcon: Icon(Icons.search, color: AppColor.blackColor),
+                    prefixIcon: GestureDetector(
+                      onTap: () => searchLaundryByCity(),
+                      child: Icon(Icons.search, color: AppColor.blackColor),
+                    ),
                     hintStyle: GoogleFonts.poppins(color: AppColor.blackColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  onFieldSubmitted: (value) {},
+                  onFieldSubmitted: (value) => searchLaundryByCity(),
                 ),
               ),
               AspectRatio(
