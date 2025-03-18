@@ -5,6 +5,7 @@ import 'package:mylaundry/models/shop/shop.dart';
 final laundryCategoryProvider = StateProvider.autoDispose((ref) => 'All');
 final promoStatusProvider = StateProvider.autoDispose((ref) => '');
 final recommendationStatusProvider = StateProvider.autoDispose((ref) => '');
+final laundryMerchantStatusProvider = StateProvider.autoDispose((ref) => '');
 
 setLaundryCategory(WidgetRef ref, String newCategory) {
   ref.read(laundryCategoryProvider.notifier).state = newCategory;
@@ -18,6 +19,10 @@ setRecommendationStatus(WidgetRef ref, String newStatus) {
   ref.read(recommendationStatusProvider.notifier).state = newStatus;
 }
 
+setLaundryMerchantStatus(WidgetRef ref, String newStatus) {
+  ref.read(laundryMerchantStatusProvider.notifier).state = newStatus;
+}
+
 final promoListProvider =
     StateNotifierProvider.autoDispose<PromoList, List<Promo>>(
       (ref) => PromoList([]),
@@ -26,6 +31,11 @@ final promoListProvider =
 final recommendationListProvider =
     StateNotifierProvider.autoDispose<RecommendationList, List<Shop>>(
       (ref) => RecommendationList([]),
+    );
+
+final laundryMerchantListProvider =
+    StateNotifierProvider.autoDispose<LaundryMerchantList, List<Shop>>(
+      (ref) => LaundryMerchantList([]),
     );
 
 class PromoList extends StateNotifier<List<Promo>> {
@@ -41,5 +51,17 @@ class RecommendationList extends StateNotifier<List<Shop>> {
 
   initData(List<Shop> data) {
     state = data;
+  }
+}
+
+class LaundryMerchantList extends StateNotifier<List<Shop>> {
+  LaundryMerchantList(super.state);
+
+  initData(List<Shop> data) {
+    state = data;
+  }
+
+  addData(List<Shop> data) {
+    state = [...state, ...data];
   }
 }

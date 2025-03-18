@@ -22,4 +22,21 @@ class ShopService {
       return Left(FetchFailure(e.toString()));
     }
   }
+
+  static Future<Either<Failure, Map>> readShop(params) async {
+    String queryString = AppRequest.params(params);
+    Uri url = Uri.parse('${AppConstant.baseUrl}/shop?$queryString');
+    try {
+      final response = await http.get(url, headers: AppRequest.header());
+
+      final data = AppResponse.data(response);
+      return Right(data);
+    } catch (e) {
+      if (e is Failure) {
+        return Left(e);
+      }
+
+      return Left(FetchFailure(e.toString()));
+    }
+  }
 }

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
-import 'package:mylaundry/configs/constants/app_format.dart';
 import 'package:mylaundry/configs/constants/failure.dart';
 import 'package:mylaundry/configs/services/promo/promo_service.dart';
 import 'package:mylaundry/configs/services/shop/shop_service.dart';
@@ -11,6 +10,7 @@ import 'package:mylaundry/models/promo/promo.dart';
 import 'package:mylaundry/models/shop/shop.dart';
 import 'package:mylaundry/providers/home/home_provider.dart';
 import 'package:mylaundry/widgets/laundry_shop_card.dart';
+import 'package:mylaundry/widgets/promo_shop_card.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -22,6 +22,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   TextEditingController searchController = TextEditingController();
+  ScrollController scrollController = ScrollController();
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
 
   getPromo() {
     PromoService.readPromo().then((value) {
@@ -96,28 +99,100 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  getLaundryMerchant() {
+    setState(() {
+      _isLoadingMore = true;
+    });
+    ShopService.readShop({'page': '$_currentPage', 'limit': '5'}).then((value) {
+      value.fold(
+        (failure) {
+          setState(() {
+            _isLoadingMore = false;
+          });
+          switch (failure.runtimeType) {
+            case ServerFailure _:
+              setLaundryMerchantStatus(ref, 'Server Error');
+              break;
+            case NotFoundFailure _:
+              setLaundryMerchantStatus(ref, 'Laundry Merchant Not Found');
+              break;
+            case ForbiddenFailure _:
+              setLaundryMerchantStatus(ref, 'You don\'t have access');
+              break;
+            case BadRequestFailure _:
+              setLaundryMerchantStatus(ref, 'Bad Request');
+              break;
+            case UnauthorisedFailure _:
+              setLaundryMerchantStatus(ref, 'Unauthorised');
+              break;
+            default:
+              setLaundryMerchantStatus(ref, 'Request Error');
+              break;
+          }
+        },
+        (result) {
+          setState(() {
+            _isLoadingMore = false;
+          });
+          setLaundryMerchantStatus(ref, 'Success');
+          List data = result['data'];
+          List<Shop> laundryMerchant =
+              data.map((e) => Shop.fromJson(e)).toList();
+          ref
+              .read(laundryMerchantListProvider.notifier)
+              .addData(laundryMerchant);
+        },
+      );
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getShopRecommendation();
     getPromo();
+    getLaundryMerchant();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+              scrollController.position.maxScrollExtent &&
+          !_isLoadingMore) {
+        _currentPage++;
+        getLaundryMerchant();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListView(
+        child: SingleChildScrollView(
+          controller: scrollController,
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          children: [
-            buildHeader(),
-            SizedBox(height: 32),
-            buildLaundryCategory(),
-            SizedBox(height: 24),
-            buildPromo(),
-            SizedBox(height: 24),
-            buildRecommendation(),
-          ],
+          child: Column(
+            children: [
+              buildHeader(),
+              SizedBox(height: 32),
+              buildLaundryCategory(),
+              SizedBox(height: 24),
+              buildPromo(),
+              SizedBox(height: 24),
+              buildRecommendation(),
+              SizedBox(height: 24),
+              buildLaundryMerchant(),
+              if (_isLoadingMore)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -279,102 +354,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     itemBuilder: (context, index) {
                       Promo promo = promoList[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 30),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: FadeInImage(
-                                  placeholder: AssetImage(
-                                    'assets/images/placeholder_laundry.jpg',
-                                  ),
-                                  image: NetworkImage(
-                                    Uri.encodeFull(
-                                      '${AppConstant.imageUrl}/promo/${promo.image}',
-                                    ),
-                                  ),
-                                  fit: BoxFit.cover,
-                                  imageErrorBuilder: (
-                                    context,
-                                    error,
-                                    stackTrace,
-                                  ) {
-                                    return Container(
-                                      color: AppColor.primary100,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.error_outline,
-                                            color: AppColor.primary,
-                                          ),
-                                          SizedBox(height: 8),
-                                          Text(
-                                            'Image not available',
-                                            style: GoogleFonts.poppins(
-                                              color: AppColor.primary,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColor.whiteColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  spacing: 8,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      promo.shop.name,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Row(
-                                      spacing: 16,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '${AppFormat.shortPrice(promo.newPrice)}/kg',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColor.primary,
-                                          ),
-                                        ),
-                                        Text(
-                                          '${AppFormat.shortPrice(promo.oldPrice)}/kg',
-                                          style: GoogleFonts.poppins(
-                                            color: AppColor.redColor,
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        child: PromoShopCard(
+                          onTap: () {},
+                          imgUrl: promo.image,
+                          shopName: promo.shop.name,
+                          newPrice: promo.newPrice,
+                          oldPrice: promo.oldPrice,
                         ),
                       );
                     },
@@ -440,6 +426,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 },
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildLaundryMerchant() {
+    return Consumer(
+      builder: (context, ref, child) {
+        List<Shop> laundryMerchant = ref.watch(laundryMerchantListProvider);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'All Laundry',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 12),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: laundryMerchant.length,
+              itemBuilder: (context, index) {
+                Shop merchant = laundryMerchant[index];
+                return LaundryShopCard(
+                  imgUrl: merchant.image,
+                  shopName: merchant.name,
+                  shopAddress: merchant.location,
+                  rating: merchant.rating,
+                  width: double.infinity,
+                  height: 250,
+                );
+              },
+              separatorBuilder: (context, index) => SizedBox(height: 12),
             ),
           ],
         );

@@ -6,6 +6,8 @@ import 'package:mylaundry/configs/constants/app_constant.dart';
 
 class LaundryShopCard extends StatelessWidget {
   final VoidCallback? onTap;
+  final double? width;
+  final double? height;
   final String imgUrl;
   final String shopName;
   final String shopAddress;
@@ -13,6 +15,8 @@ class LaundryShopCard extends StatelessWidget {
   const LaundryShopCard({
     super.key,
     this.onTap,
+    this.width,
+    this.height,
     required this.imgUrl,
     required this.shopName,
     required this.shopAddress,
@@ -24,7 +28,8 @@ class LaundryShopCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 200,
+        width: width ?? 200,
+        height: height,
         child: Stack(
           fit: StackFit.expand,
           children: [

@@ -9,4 +9,12 @@ class AppRequest {
       };
     }
   }
+
+  static String params(Map<String, String> parameters) {
+    return parameters.entries
+        .map((entry) {
+          return '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}';
+        })
+        .join('&');
+  }
 }
