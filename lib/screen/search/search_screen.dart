@@ -6,6 +6,7 @@ import 'package:mylaundry/configs/constants/failure.dart';
 import 'package:mylaundry/configs/services/shop/shop_service.dart';
 import 'package:mylaundry/models/shop/shop.dart';
 import 'package:mylaundry/providers/search/search_provider.dart';
+import 'package:mylaundry/screen/laundry/detail_laundry_merchant_screen.dart';
 import 'package:mylaundry/widgets/laundry_shop_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -114,7 +115,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               itemBuilder: (context, index) {
                 Shop laundry = searchResult[index];
                 return LaundryShopCard(
-                  onTap: () {},
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  DetailLaundryMerchantScreen(data: laundry),
+                        ),
+                      ),
                   imgUrl: laundry.image,
                   shopName: laundry.name,
                   shopAddress: laundry.location,

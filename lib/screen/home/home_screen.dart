@@ -9,6 +9,7 @@ import 'package:mylaundry/configs/services/shop/shop_service.dart';
 import 'package:mylaundry/models/promo/promo.dart';
 import 'package:mylaundry/models/shop/shop.dart';
 import 'package:mylaundry/providers/home/home_provider.dart';
+import 'package:mylaundry/screen/laundry/detail_laundry_merchant_screen.dart';
 import 'package:mylaundry/screen/search/search_screen.dart';
 import 'package:mylaundry/widgets/laundry_shop_card.dart';
 import 'package:mylaundry/widgets/promo_shop_card.dart';
@@ -136,7 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         (result) {
           setState(() {
             _isLoadingMore = false;
-            _totalPage = result['total_page'];
+            _totalPage = result['total_page'] ?? 2;
           });
           setLaundryMerchantStatus(ref, 'Success');
           List data = result['data'];
@@ -205,11 +206,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 buildRecommendation(),
                 SizedBox(height: 24),
                 buildLaundryMerchant(),
-                if (_isLoadingMore)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
-                  ),
               ],
             ),
           ),
@@ -442,6 +438,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 itemBuilder: (context, index) {
                   Shop shop = recommendationList[index];
                   return LaundryShopCard(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  DetailLaundryMerchantScreen(data: shop),
+                        ),
+                      );
+                    },
                     imgUrl: shop.image,
                     shopName: shop.name,
                     shopAddress: shop.location,
@@ -478,6 +484,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               itemBuilder: (context, index) {
                 Shop merchant = laundryMerchant[index];
                 return LaundryShopCard(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                DetailLaundryMerchantScreen(data: merchant),
+                      ),
+                    );
+                  },
                   imgUrl: merchant.image,
                   shopName: merchant.name,
                   shopAddress: merchant.location,
@@ -488,6 +504,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
               separatorBuilder: (context, index) => SizedBox(height: 12),
             ),
+            if (_isLoadingMore) Center(child: CircularProgressIndicator()),
           ],
         );
       },

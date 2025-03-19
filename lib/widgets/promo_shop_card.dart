@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
 import 'package:mylaundry/configs/constants/app_format.dart';
-import 'package:mylaundry/widgets/image_error_placeholder.dart';
+import 'package:mylaundry/widgets/network_image_placeholder.dart';
 
 class PromoShopCard extends StatelessWidget {
   final VoidCallback onTap;
@@ -31,16 +31,8 @@ class PromoShopCard extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 30),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: FadeInImage(
-                placeholder: AssetImage(
-                  'assets/images/placeholder_laundry.jpg',
-                ),
-                image: NetworkImage(
-                  Uri.encodeFull('${AppConstant.imageUrl}/promo/$imgUrl'),
-                ),
-                fit: BoxFit.cover,
-                imageErrorBuilder:
-                    (context, error, stackTrace) => ImageErrorPlaceholder(),
+              child: NetworkImagePlaceholder(
+                imgUrl: '${AppConstant.imageUrl}/promo/$imgUrl',
               ),
             ),
           ),

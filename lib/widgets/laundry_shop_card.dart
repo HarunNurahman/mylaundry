@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
-import 'package:mylaundry/widgets/image_error_placeholder.dart';
+import 'package:mylaundry/widgets/network_image_placeholder.dart';
 
 class LaundryShopCard extends StatelessWidget {
   final VoidCallback? onTap;
@@ -36,16 +36,8 @@ class LaundryShopCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: FadeInImage(
-                placeholder: AssetImage(
-                  'assets/images/placeholder_laundry.jpg',
-                ),
-                image: NetworkImage(
-                  Uri.encodeFull('${AppConstant.imageUrl}/shop/$imgUrl'),
-                ),
-                fit: BoxFit.cover,
-                imageErrorBuilder:
-                    (context, error, stackTrace) => ImageErrorPlaceholder(),
+              child: NetworkImagePlaceholder(
+                imgUrl: '${AppConstant.imageUrl}/shop/$imgUrl',
               ),
             ),
             Align(
