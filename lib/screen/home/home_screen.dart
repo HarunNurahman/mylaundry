@@ -8,6 +8,7 @@ import 'package:mylaundry/configs/services/promo/promo_service.dart';
 import 'package:mylaundry/configs/services/shop/shop_service.dart';
 import 'package:mylaundry/models/promo/promo.dart';
 import 'package:mylaundry/models/shop/shop.dart';
+import 'package:mylaundry/models/shop/shop_result.dart';
 import 'package:mylaundry/providers/home/home_provider.dart';
 import 'package:mylaundry/screen/laundry/detail_laundry_merchant_screen.dart';
 import 'package:mylaundry/screen/search/search_screen.dart';
@@ -28,6 +29,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentPage = 1;
   int _totalPage = 1;
   bool _isLoadingMore = false;
+
+  Map<String, String> params() {
+    return {'page': '$_currentPage', 'limit': '10'};
+  }
 
   getPromo() {
     PromoService.readPromo().then((value) {
@@ -103,11 +108,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   getLaundryMerchant() {
-    if (_currentPage > _totalPage) return;
+    if (_isLoadingMore || _currentPage > _totalPage) return;
     setState(() {
       _isLoadingMore = true;
     });
-    ShopService.readShop({'page': '$_currentPage', 'limit': '5'}).then((value) {
+    ShopService.readShop(params()).then((value) {
       value.fold(
         (failure) {
           setState(() {
@@ -137,15 +142,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         (result) {
           setState(() {
             _isLoadingMore = false;
-            _totalPage = result['total_page'] ?? 2;
+            _currentPage++;
           });
           setLaundryMerchantStatus(ref, 'Success');
-          List data = result['data'];
-          List<Shop> laundryMerchant =
-              data.map((e) => Shop.fromJson(e)).toList();
+          ShopResult shopResult = ShopResult.fromJson(
+            result as Map<String, dynamic>,
+          );
+          _totalPage = shopResult.pagination?.totalPage ?? 1;
           ref
               .read(laundryMerchantListProvider.notifier)
-              .addData(laundryMerchant);
+              .addData(shopResult.data);
         },
       );
     });
@@ -161,6 +167,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void getData() {
+    _currentPage = 1;
+    _totalPage = 1;
+    ref
+        .read(laundryMerchantListProvider.notifier)
+        .initData(ShopResult(data: [], pagination: null));
     getShopRecommendation();
     getPromo();
     getLaundryMerchant();
@@ -174,7 +185,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (scrollController.position.pixels ==
               scrollController.position.maxScrollExtent &&
           !_isLoadingMore) {
-        _currentPage++;
         getLaundryMerchant();
       }
     });
@@ -465,7 +475,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget buildLaundryMerchant() {
     return Consumer(
       builder: (context, ref, child) {
-        List<Shop> laundryMerchant = ref.watch(laundryMerchantListProvider);
+        List<Shop> laundryMerchant =
+            ref.watch(laundryMerchantListProvider).data;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

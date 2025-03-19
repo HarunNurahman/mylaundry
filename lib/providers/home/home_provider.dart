@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mylaundry/models/promo/promo.dart';
+import 'package:mylaundry/models/shop/pagination.dart';
 import 'package:mylaundry/models/shop/shop.dart';
+import 'package:mylaundry/models/shop/shop_result.dart';
 
 final laundryCategoryProvider = StateProvider.autoDispose((ref) => 'All');
 final promoStatusProvider = StateProvider.autoDispose((ref) => '');
@@ -34,8 +36,8 @@ final recommendationListProvider =
     );
 
 final laundryMerchantListProvider =
-    StateNotifierProvider.autoDispose<LaundryMerchantList, List<Shop>>(
-      (ref) => LaundryMerchantList([]),
+    StateNotifierProvider.autoDispose<LaundryMerchantList, ShopResult>(
+      (ref) => LaundryMerchantList(ShopResult(data: [], pagination: null)),
     );
 
 class PromoList extends StateNotifier<List<Promo>> {
@@ -54,14 +56,17 @@ class RecommendationList extends StateNotifier<List<Shop>> {
   }
 }
 
-class LaundryMerchantList extends StateNotifier<List<Shop>> {
+class LaundryMerchantList extends StateNotifier<ShopResult> {
   LaundryMerchantList(super.state);
 
-  initData(List<Shop> data) {
+  initData(ShopResult data) {
     state = data;
   }
 
-  addData(List<Shop> data) {
-    state = [...state, ...data];
+  addData(List<Shop> newData) {
+    state = ShopResult(
+      data: [...state.data, ...newData],
+      pagination: state.pagination,
+    );
   }
 }

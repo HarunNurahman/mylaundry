@@ -8,9 +8,9 @@ part 'shop_result.g.dart';
 @JsonSerializable()
 class ShopResult {
   final List<Shop> data;
-  final Pagination pagination;
+  final Pagination? pagination;
 
-  ShopResult({required this.data, required this.pagination});
+  ShopResult({required this.data, this.pagination});
 
   factory ShopResult.fromJson(Map<String, dynamic> json) =>
       _$ShopResultFromJson(json);
