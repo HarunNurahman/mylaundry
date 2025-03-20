@@ -13,7 +13,6 @@ import 'package:mylaundry/models/laundry/laundry.dart';
 import 'package:mylaundry/models/laundry/laundry_result.dart';
 import 'package:mylaundry/models/user/user.dart';
 import 'package:mylaundry/providers/laundry/laundry_provider.dart';
-import 'package:mylaundry/widgets/custom_auth_form_field.dart';
 
 class MyLaundryScreen extends ConsumerStatefulWidget {
   const MyLaundryScreen({super.key});
