@@ -1,16 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mylaundry/models/promo/promo.dart';
-import 'package:mylaundry/models/shop/pagination.dart';
 import 'package:mylaundry/models/shop/shop.dart';
 import 'package:mylaundry/models/shop/shop_result.dart';
 
-final laundryCategoryProvider = StateProvider.autoDispose((ref) => 'All');
+final laundryCategoryStatusProvider = StateProvider.autoDispose((ref) => 'All');
 final promoStatusProvider = StateProvider.autoDispose((ref) => '');
 final recommendationStatusProvider = StateProvider.autoDispose((ref) => '');
 final laundryMerchantStatusProvider = StateProvider.autoDispose((ref) => '');
 
-setLaundryCategory(WidgetRef ref, String newCategory) {
-  ref.read(laundryCategoryProvider.notifier).state = newCategory;
+setLaundryCategoryStatus(WidgetRef ref, String newCategory) {
+  ref.read(laundryCategoryStatusProvider.notifier).state = newCategory;
 }
 
 setPromoStatus(WidgetRef ref, String newStatus) {

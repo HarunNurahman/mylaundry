@@ -35,7 +35,7 @@ class _CustomAuthFormFieldState extends State<CustomAuthFormField> {
           height: 48,
           width: 48,
           decoration: BoxDecoration(
-            color: AppColor.whiteColor.withOpacity(0.7),
+            color: AppColor.whiteColor.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(child: Icon(widget.iconUrl, color: AppColor.primary)),

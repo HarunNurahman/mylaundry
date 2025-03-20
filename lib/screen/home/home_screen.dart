@@ -30,9 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _totalPage = 1;
   bool _isLoadingMore = false;
 
-  Map<String, String> params() {
-    return {'page': '$_currentPage', 'limit': '10'};
-  }
+  Map<String, String> params() => {'page': '$_currentPage', 'limit': '10'};
 
   getPromo() {
     PromoService.readPromo().then((value) {
@@ -46,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               setPromoStatus(ref, 'Promo Not Found');
               break;
             case ForbiddenFailure _:
-              setPromoStatus(ref, 'You don\'t have access');
+              setPromoStatus(ref, 'You don\'t have an access');
               break;
             case BadRequestFailure _:
               setPromoStatus(ref, 'Bad Request');
@@ -298,7 +296,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget buildLaundryCategory() {
     return Consumer(
       builder: (context, ref, child) {
-        String selectedCategory = ref.watch(laundryCategoryProvider);
+        String selectedCategory = ref.watch(laundryCategoryStatusProvider);
         return SizedBox(
           height: 30,
           child: ListView.separated(
@@ -309,7 +307,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               String category = AppConstant.laundryCategories[index];
               return GestureDetector(
                 onTap: () {
-                  setLaundryCategory(ref, category);
+                  setLaundryCategoryStatus(ref, category);
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),

@@ -11,7 +11,10 @@ ShopResult _$ShopResultFromJson(Map<String, dynamic> json) => ShopResult(
       (json['data'] as List<dynamic>)
           .map((e) => Shop.fromJson(e as Map<String, dynamic>))
           .toList(),
-  pagination: Pagination.fromJson(json['pagination'] as Map<String, dynamic>),
+  pagination:
+      json['pagination'] == null
+          ? null
+          : Pagination.fromJson(json['pagination'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$ShopResultToJson(ShopResult instance) =>

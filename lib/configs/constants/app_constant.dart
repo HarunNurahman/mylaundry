@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylaundry/screen/home/home_screen.dart';
+import 'package:mylaundry/screen/laundry/my_laundry_screen.dart';
 import 'package:mylaundry/screen/profile/profile_screen.dart';
 
 class AppConstant {
@@ -28,7 +29,7 @@ class AppConstant {
   static List<Map> dashboardNavigation = [
     {'view': HomeScreen(), 'icon': Icon(Icons.home), 'label': 'Home'},
     {
-      'view': HomeScreen(),
+      'view': MyLaundryScreen(),
       'icon': Icon(Icons.local_laundry_service),
       'label': 'My Laundry',
     },

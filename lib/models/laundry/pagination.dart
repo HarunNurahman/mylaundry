@@ -12,7 +12,7 @@ class Pagination {
   final int? currentPage;
   final int? limit;
 
-  Pagination({this.totalItem, this.totalPage, this.currentPage, this.limit});
+  Pagination(this.totalItem, this.totalPage, this.currentPage, this.limit);
 
   factory Pagination.fromJson(Map<String, dynamic> json) =>
       _$PaginationFromJson(json);
