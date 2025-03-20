@@ -40,7 +40,7 @@ class _CustomAuthFormFieldState extends State<CustomAuthFormField> {
           ),
           child: Center(child: Icon(widget.iconUrl, color: AppColor.primary)),
         ),
-        SizedBox(width: 16), // Add spacing between the icon and the text field
+        SizedBox(width: 16),
         Expanded(
           child: TextFormField(
             controller: widget.controller,

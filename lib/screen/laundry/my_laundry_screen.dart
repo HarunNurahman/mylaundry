@@ -5,6 +5,7 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:mylaundry/configs/constants/app_color.dart';
 import 'package:mylaundry/configs/constants/app_constant.dart';
 import 'package:mylaundry/configs/constants/app_format.dart';
+import 'package:mylaundry/configs/constants/app_response.dart';
 import 'package:mylaundry/configs/constants/app_session.dart';
 import 'package:mylaundry/configs/constants/failure.dart';
 import 'package:mylaundry/configs/services/laundry/laundry_service.dart';
@@ -12,6 +13,7 @@ import 'package:mylaundry/models/laundry/laundry.dart';
 import 'package:mylaundry/models/laundry/laundry_result.dart';
 import 'package:mylaundry/models/user/user.dart';
 import 'package:mylaundry/providers/laundry/laundry_provider.dart';
+import 'package:mylaundry/widgets/custom_auth_form_field.dart';
 
 class MyLaundryScreen extends ConsumerStatefulWidget {
   const MyLaundryScreen({super.key});
@@ -90,6 +92,51 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
     });
   }
 
+  claimLaundry(String laundryId, String claimCode) {
+    LaundryService.claimLaundry(laundryId, claimCode).then((value) {
+      value.fold(
+        (failure) {
+          switch (failure.runtimeType) {
+            case ServerFailure _:
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(failure.message!)));
+              break;
+            case NotFoundFailure _:
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(failure.message!)));
+              break;
+            case ForbiddenFailure _:
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(failure.message!)));
+              break;
+            case BadRequestFailure _:
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(failure.message!)));
+              break;
+            case InvalidInputFailure _:
+              AppResponse.invalidInput(context, failure.message ?? '');
+              break;
+            default:
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(failure.message!)));
+              break;
+          }
+        },
+        (result) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Laundry claimed successfully')),
+          );
+          getMyLaundry();
+        },
+      );
+    });
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getData());
@@ -149,8 +196,9 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: AppColor.grayColor),
           ),
-          onPressed: () {},
+          onPressed: () => claimDialog(),
           child: Row(
+            spacing: 8,
             children: [
               Icon(Icons.add, color: AppColor.primary),
               Text(
@@ -257,6 +305,9 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
               controller: scrollController,
               padding: EdgeInsets.symmetric(horizontal: 16),
               elements: list,
+              itemComparator: (element1, element2) {
+                return element1.createdAt.compareTo(element2.createdAt);
+              },
               groupBy:
                   (element) => DateTime(
                     element.createdAt.year,
@@ -351,6 +402,7 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
+        spacing: 4,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
@@ -364,6 +416,104 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
           Icon(Icons.check_circle, color: AppColor.whiteColor, size: 16),
         ],
       ),
+    );
+  }
+
+  claimDialog() {
+    TextEditingController laundryIdController = TextEditingController();
+    TextEditingController codeController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Form(
+          key: formKey,
+          child: SimpleDialog(
+            contentPadding: EdgeInsets.all(16),
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Claim Laundry',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 16),
+                  _claimForm(
+                    controller: laundryIdController,
+                    keyboardType: TextInputType.numberWithOptions(),
+                    label: 'Laundry ID',
+                    hintText: 'Laundry ID',
+                    validator: (value) => value!.isEmpty ? 'Required' : null,
+                  ),
+                  SizedBox(height: 16),
+                  _claimForm(
+                    controller: codeController,
+                    label: 'Claim Code',
+                    hintText: 'Claim Code',
+                    validator: (value) => value!.isEmpty ? 'Required' : null,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        Navigator.pop(context);
+                        claimLaundry(
+                          laundryIdController.text,
+                          codeController.text,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 50),
+                    ),
+                    child: Text(
+                      'Claim Now',
+                      style: TextStyle(color: AppColor.whiteColor),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Center(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: AppColor.primary),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _claimForm({
+    TextEditingController? controller,
+    TextInputType? keyboardType,
+    String? hintText,
+    String? label,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      spacing: 4,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label!, style: TextStyle(fontWeight: FontWeight.w600)),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType ?? TextInputType.text,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: AppColor.grayColor),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          validator: validator,
+        ),
+      ],
     );
   }
 }
