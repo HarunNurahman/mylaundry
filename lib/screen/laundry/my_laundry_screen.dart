@@ -13,6 +13,7 @@ import 'package:mylaundry/models/laundry/laundry.dart';
 import 'package:mylaundry/models/laundry/laundry_result.dart';
 import 'package:mylaundry/models/user/user.dart';
 import 'package:mylaundry/providers/laundry/laundry_provider.dart';
+import 'package:mylaundry/screen/laundry/my_detail_laundry_screen.dart';
 
 class MyLaundryScreen extends ConsumerStatefulWidget {
   const MyLaundryScreen({super.key});
@@ -333,6 +334,15 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
                   element.weight,
                   element.withPickup,
                   element.withDelivery,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => MyDetailLaundryScreen(data: element),
+                      ),
+                    );
+                  },
                 );
               },
               order: GroupedListOrder.DESC,
@@ -348,47 +358,51 @@ class _MyLaundryScreenState extends ConsumerState<MyLaundryScreen> {
     double totalPrice,
     double totalWeight,
     bool isPickup,
-    bool isDelivery,
-  ) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 8),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColor.primary200,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            spacing: 8,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                merchantName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              if (isPickup == true || isDelivery == true)
-                Row(
-                  spacing: 8,
-                  children: [
-                    if (isPickup == true) _itemOrder('Pickup'),
-                    if (isDelivery == true) _itemOrder('Delivery'),
-                  ],
+    bool isDelivery, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColor.primary200,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              spacing: 8,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  merchantName,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                AppFormat.longPrice(totalPrice),
-                style: TextStyle(fontSize: 16),
-              ),
-              Text('$totalWeight kg'),
-            ],
-          ),
-        ],
+                if (isPickup == true || isDelivery == true)
+                  Row(
+                    spacing: 8,
+                    children: [
+                      if (isPickup == true) _itemOrder('Pickup'),
+                      if (isDelivery == true) _itemOrder('Delivery'),
+                    ],
+                  ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  AppFormat.longPrice(totalPrice),
+                  style: TextStyle(fontSize: 16),
+                ),
+                Text('$totalWeight kg'),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

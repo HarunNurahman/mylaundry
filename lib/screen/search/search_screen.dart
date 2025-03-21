@@ -21,8 +21,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   TextEditingController searchController = TextEditingController();
 
   searchCity() {
-    setSearchStatus(ref, 'Loading');
     ShopService.searchByCity('city=${searchController.text}').then((value) {
+      setSearchStatus(ref, 'Loading');
       value.fold(
         (failure) {
           switch (failure.runtimeType) {
@@ -42,7 +42,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               setSearchStatus(ref, 'Unauthorised');
               break;
             default:
-              setSearchStatus(ref, 'Something went wrong');
+              setSearchStatus(ref, 'Not Found');
               break;
           }
         },
